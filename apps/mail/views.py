@@ -1,3 +1,4 @@
+# Integracion de logica de mail para usuario
 import json
 from datetime import timedelta
 from urllib.parse import urlencode

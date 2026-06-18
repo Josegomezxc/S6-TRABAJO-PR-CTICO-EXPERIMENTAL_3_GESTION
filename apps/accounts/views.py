@@ -9,7 +9,7 @@ from .services.auth_service import authenticate_flexible, login_single_session
 from .services.profile_service import get_user_initials, get_user_color
 from apps.core.services.stats_service import profile_stats
 
-
+#estas son las funciones
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
