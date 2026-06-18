@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import Alias
 from apps.core.mock_data import get_mock_aliases
 
+# Integracion de logica de alias temporales para usuario
 
 ALIAS_LIMIT_PER_USER = 5
 ALIAS_BATCH = 6
