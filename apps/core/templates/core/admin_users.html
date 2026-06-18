@@ -1,0 +1,200 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Usuarios — Panel admin{% endblock %}
+{% block page_title %}Usuarios{% endblock %}
+{% block nav_admin_users %}active{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'core/styles/admin_users.css' %}?v=carbon-fix-1">
+<link rel="stylesheet" href="{% static 'core/styles/ds_table.css' %}?v=carbon-fix-1">
+{% endblock %}
+
+{% block body %}
+
+<header class="adm-header">
+  <div>
+    <h1>Usuarios registrados</h1>
+    <p>{{ counts.all }} cuenta{{ counts.all|pluralize:"s" }} · gestiona roles y revisa actividad</p>
+  </div>
+</header>
+
+<!-- ── Toolbar: buscador a la izquierda + filtros a la derecha ── -->
+<div class="users-toolbar">
+  <form method="get" action="" class="search-bar" role="search" id="adm-users-search-form">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <label for="userSearch" class="sr-only">Buscar usuarios por correo o nombre</label>
+    <input type="search" id="userSearch" name="q" value="{{ q }}"
+           placeholder="Buscar por correo o nombre..." autocomplete="off">
+    {% if role and role != 'all' %}<input type="hidden" name="role" value="{{ role }}">{% endif %}
+  </form>
+
+  <nav class="users-filters" id="usersFilters" aria-label="Filtros por rol">
+  <a href="?{% if q %}q={{ q }}{% endif %}"
+     class="users-filter-btn {% if role == 'all' %}active{% endif %}"
+     {% if role == 'all' %}aria-current="page"{% endif %}>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+    Todos
+    <span class="users-filter-count">{{ counts.all }}</span>
+  </a>
+  <a href="?role=admin{% if q %}&q={{ q }}{% endif %}"
+     class="users-filter-btn admin {% if role == 'admin' %}active{% endif %}"
+     {% if role == 'admin' %}aria-current="page"{% endif %}>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+    Administradores
+    <span class="users-filter-count">{{ counts.admin }}</span>
+  </a>
+  <a href="?role=user{% if q %}&q={{ q }}{% endif %}"
+     class="users-filter-btn {% if role == 'user' %}active{% endif %}"
+     {% if role == 'user' %}aria-current="page"{% endif %}>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Usuarios normales
+    <span class="users-filter-count">{{ counts.user }}</span>
+  </a>
+  <a href="?role=threats{% if q %}&q={{ q }}{% endif %}"
+     class="users-filter-btn warn {% if role == 'threats' %}active{% endif %}"
+     {% if role == 'threats' %}aria-current="page"{% endif %}>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+    Con amenazas
+    <span class="users-filter-count">{{ counts.threats }}</span>
+  </a>
+  </nav>
+</div>
+
+{% if messages %}
+  <div role="status" aria-live="polite">
+    {% for message in messages %}
+      <div class="adm-alert {% if message.tags == 'error' %}err{% endif %}" role="alert">
+        {% if message.tags == 'error' %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+        {% else %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        {% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="users-table-wrap">
+  <table class="users-table">
+    <caption class="sr-only">Lista de usuarios registrados con su rol y estadísticas</caption>
+    <thead>
+      <tr>
+        <th scope="col" style="text-align:center">Usuario</th>
+        <th scope="col" style="text-align:center">Rol</th>
+        <th scope="col" style="text-align:center">Aliases</th>
+        <th scope="col" style="text-align:center">Correos</th>
+        <th scope="col" style="text-align:center">Amenazas</th>
+        <th scope="col" style="text-align:center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="usersTbody">
+      {% for u in users %}
+      <tr data-search="{{ u.email|lower }} {{ u.get_full_name|lower }}"
+          data-role="{% if u.is_staff %}admin{% else %}user{% endif %}"
+          data-threats="{{ u.threats_count|default:0 }}">
+        <td>
+          <div class="user-cell">
+            <div class="user-avatar" aria-hidden="true">
+              {{ u.email|first|upper }}{{ u.email|slice:"1:2"|upper }}
+            </div>
+            <div class="user-name-col">
+              <span class="user-email">{{ u.email }}</span>
+              <div class="user-joined">Alta {{ u.date_joined|date:"d/m/Y" }}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if u.is_staff %}
+            <span class="role-badge admin">
+              <span class="dot" aria-hidden="true"></span> ADMINISTRADOR
+            </span>
+          {% else %}
+            <span class="role-badge user">
+              <span class="dot" aria-hidden="true"></span> USUARIO
+            </span>
+          {% endif %}
+        </td>
+        <td class="num-cell {% if u.aliases_count == 0 %}muted{% endif %}">{{ u.aliases_count }}</td>
+        <td class="num-cell {% if u.emails_count == 0 %}muted{% endif %}">{{ u.emails_count }}</td>
+        <td class="num-cell {% if u.threats_count %}threat{% else %}muted{% endif %}">{{ u.threats_count }}</td>
+        <td>
+          <div class="row-actions" role="group" aria-label="Acciones para {{ u.email }}">
+            <a href="{% url 'admin_user_detail' u.pk %}" class="btn-mini primary">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Ver
+            </a>
+            {% if u == request.user %}
+              <span class="self-note">(tú)</span>
+            {% else %}
+              <form method="post" action="{% url 'admin_toggle_staff' u.pk %}" style="display:inline"
+                    onsubmit="return confirm('{% if u.is_staff %}¿Quitar permisos de administrador a {{ u.email }}?{% else %}¿Hacer administrador a {{ u.email }}?{% endif %}');">
+                {% csrf_token %}
+                {% if u.is_staff %}
+                  <button type="submit" class="btn-mini demote" title="Quitar rol admin">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Degradar
+                  </button>
+                {% else %}
+                  <button type="submit" class="btn-mini promote" title="Promover a admin">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="17 11 12 6 7 11"/><line x1="12" y1="18" x2="12" y2="6"/></svg>
+                    Promover
+                  </button>
+                {% endif %}
+              </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--text-muted);font-family:var(--mono)">
+        {% if q or role != 'all' %}
+          Ningún usuario coincide con los filtros.
+          <a href="{% url 'admin_users' %}" style="color:var(--accent-hover);text-decoration:underline;margin-left:.5rem">Limpiar</a>
+        {% else %}
+          No hay usuarios registrados.
+        {% endif %}
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% include 'core/_pagination.html' with page_obj=page_obj qs_params=qs_params %}
+</div>
+
+<script>
+/* Búsqueda con debounce 350ms: a cada keystroke reinicia el timer y al
+   soltar navega a la URL con el nuevo ?q=. Preserva role= y resetea
+   ?page= (siempre vuelve a la página 1 cuando cambia la query). */
+(function () {
+  const form  = document.getElementById('adm-users-search-form');
+  const input = document.getElementById('userSearch');
+  if (!form || !input) return;
+
+  let timer = null;
+  function go() {
+    const q = input.value.trim();
+    const url = new URL(window.location.href);
+    if (q) url.searchParams.set('q', q);
+    else   url.searchParams.delete('q');
+    url.searchParams.delete('page');
+    if (url.toString() !== window.location.href) {
+      window.location.href = url.toString();
+    }
+  }
+  input.addEventListener('input', function () {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(go, 350);
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (timer) clearTimeout(timer);
+    go();
+  });
+})();
+</script>
+
+{% endblock %}

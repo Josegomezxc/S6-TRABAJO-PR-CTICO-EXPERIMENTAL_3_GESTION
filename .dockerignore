@@ -1,0 +1,11 @@
+ent_email/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.git
+.gitignore
+README.md
+db.sqlite3
+.docker/
