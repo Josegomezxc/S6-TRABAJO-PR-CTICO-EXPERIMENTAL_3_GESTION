@@ -1,64 +1,63 @@
-# Buenas pr·cticas para trabajar con control de versiones y contenedores
+# Buenas pr√°cticas para trabajar con control de versiones y contenedores
 
 ## 1. Convenciones de nomenclatura (Naming Conventions)
 
 ### Python / Django
-- **Archivos Python**: snake_case (uth_service.py, profile_service.py)
+- **Archivos Python**: snake_case (auth_service.py, profile_service.py)
 - **Clases**: PascalCase (AuthService, ProfileService)
 - **Funciones/variables**: snake_case (get_user_by_email(), login_fails)
-- **Constantes**: MAY⁄SCULAS con guiones bajos (LOGIN_MAX_FAILS, SESSION_IDLE_TIMEOUT_SECONDS)
+- **Constantes**: MAY√öSCULAS con guiones bajos (LOGIN_MAX_FAILS, SESSION_IDLE_TIMEOUT_SECONDS)
 
 ### CSS
-- **Archivos**: snake_case (login.css, dmin_dashboard.css)
+- **Archivos**: snake_case (login.css, admin_dashboard.css)
 - **Selectores**: kebab-case (.user-card, .btn-primary)
 - **Variables CSS**: kebab-case con -- (--ai-purple, --danger)
 
 ### JavaScript
-- **Archivos**: snake_case (inbox.js, ase_2.js)
-- **Funciones**: camelCase (etchNewEmails(), showToast())
-- **Variables**: camelCase (
-ewEmailCount, isLoading)
+- **Archivos**: snake_case (inbox.js, base_2.js)
+- **Funciones**: camelCase (fetchNewEmails(), showToast())
+- **Variables**: camelCase (newEmailCount, isLoading)
 
 ### Plantillas Django
-- **Archivos**: snake_case (login.html, dmin_user_detail.html)
+- **Archivos**: snake_case (login.html, admin_user_detail.html)
 - **Nombres de bloque**: descriptivos ({% block content %}, no {% block body %})
 
 ### Git
-- **Ramas**: usar / para separar tipo/propÛsito:
-  - eature/nueva-funcionalidad
-  - ix/correccion-error
+- **Ramas**: usar / para separar tipo/prop√≥sito:
+  - feature/nueva-funcionalidad
+  - fix/correccion-error
   - docs/actualizar-readme
-  - efactor/mejora-rendimiento
+  - refactor/mejora-rendimiento
 
 ---
 
 ## 2. Mensajes de commit (Conventional Commits)
 
-Usar el formato est·ndar **Conventional Commits**:
+Usar el formato est√°ndar **Conventional Commits**:
 
-\\\
-<tipo>(<alcance opcional>): <descripciÛn breve>
+```
+<tipo>(<alcance opcional>): <descripci√≥n breve>
 
 <cuerpo opcional>
-\\\
+```
 
 ### Tipos permitidos
 
-| Tipo | Cu·ndo usarlo |
+| Tipo | Cu√°ndo usarlo |
 |------|---------------|
-| eat | Nueva funcionalidad |
-| ix | CorrecciÛn de bug |
-| docs | Cambios en documentaciÛn |
-| style | Formato, estilos (no cambia lÛgica) |
-| efactor | RefactorizaciÛn de cÛdigo |
+| feat | Nueva funcionalidad |
+| fix | Correcci√≥n de bug |
+| docs | Cambios en documentaci√≥n |
+| style | Formato, estilos (no cambia l√≥gica) |
+| refactor | Refactorizaci√≥n de c√≥digo |
 | perf | Mejora de rendimiento |
-| 	est | AÒadir o modificar tests |
+| test | A√±adir o modificar tests |
 | chore | Tareas de mantenimiento (config, build) |
 | ci | Cambios en CI/CD |
 
 ### Ejemplos
 
-\\\
+```
 feat(sandbox): add dynamic execution with strace
 
 fix(auth): correct rate limit reset on successful login
@@ -66,13 +65,13 @@ fix(auth): correct rate limit reset on successful login
 docs: add API endpoint documentation
 
 chore: configure Docker multi-stage build
-\\\
+```
 
 ### Reglas
-- **M·ximo 72 caracteres** en la primera lÌnea
-- **Verboso en el cuerpo**: explicar el QU… y el POR QU…, no el C”MO
+- **M√°ximo 72 caracteres** en la primera l√≠nea
+- **Verboso en el cuerpo**: explicar el QU√â y el POR QU√â, no el C√ìMO
 - Usar **imperativo** ("add", "fix", no "added", "fixed")
-- No terminar con punto en la primera lÌnea
+- No terminar con punto en la primera l√≠nea
 
 ---
 
@@ -80,149 +79,149 @@ chore: configure Docker multi-stage build
 
 ### Estructura
 
-\\\
-main (producciÛn)
-  +-- develop (integraciÛn)
+```
+main (producci√≥n)
+  +-- develop (integraci√≥n)
         +-- feature/docker
         +-- feature/ci-cd
         +-- fix/login-error
         +-- docs/readme
-\\\
+```
 
 ### Flujo de trabajo
 
-1. **main**: cÛdigo listo para producciÛn. Solo se mergea desde develop
-2. **develop**: rama de integraciÛn. AquÌ se fusionan todas las features
-3. **feature/***: ramas para desarrollo de funcionalidades especÌficas
-4. **fix/***: ramas para correcciÛn de errores
+1. **main**: c√≥digo listo para producci√≥n. Solo se mergea desde develop
+2. **develop**: rama de integraci√≥n. Aqu√≠ se fusionan todas las features
+3. **feature/***: ramas para desarrollo de funcionalidades espec√≠ficas
+4. **fix/***: ramas para correcci√≥n de errores
 
 ### Ciclo de vida de una feature
 
-\\\
+```
 git checkout develop
 git checkout -b feature/mi-funcionalidad
 # ... trabajar y hacer commits ...
 git checkout develop
 git merge feature/mi-funcionalidad
 git branch -d feature/mi-funcionalidad
-\\\
+```
 
 ### Reglas
 - **Nunca** commitear directamente en main o develop
-- Siempre crear una rama especÌfica para cada tarea
-- Mantener las ramas cortas (1-2 dÌas m·ximo)
-- Eliminar la rama despuÈs de mergear
+- Siempre crear una rama espec√≠fica para cada tarea
+- Mantener las ramas cortas (1-2 d√≠as m√°ximo)
+- Eliminar la rama despu√©s de mergear
 
 ---
 
-## 4. ResoluciÛn de conflictos
+## 4. Resoluci√≥n de conflictos
 
-### PrevenciÛn
+### Prevenci√≥n
 - Mantener las ramas actualizadas con develop frecuentemente:
-  \\\
+  ```
   git checkout feature/mi-feature
   git merge develop
-  \\\
-- Commits pequeÒos y enfocados
-- Comunicarse con el equipo sobre quÈ archivos se est·n modificando
+  ```
+- Commits peque√±os y enfocados
+- Comunicarse con el equipo sobre qu√© archivos se est√°n modificando
 
-### ResoluciÛn
+### Resoluci√≥n
 
 1. Identificar el conflicto:
-   \\\
+   ```
    git status  # muestra archivos en conflicto
-   \\\
+   ```
 
 2. Abrir el archivo y buscar los marcadores:
-   \\\
+   ```
    <<<<<<< HEAD
-   cÛdigo actual (de develop)
+   c√≥digo actual (de develop)
    =======
-   cÛdigo entrante (de tu rama)
+   c√≥digo entrante (de tu rama)
    >>>>>>> feature/mi-feature
-   \\\
+   ```
 
-3. Editar: decidir quÈ versiÛn conservar (o una combinaciÛn de ambas)
+3. Editar: decidir qu√© versi√≥n conservar (o una combinaci√≥n de ambas)
 
 4. Eliminar los marcadores <<<<<<<, =======, >>>>>>>
 
 5. Marcar como resuelto:
-   \\\
+   ```
    git add <archivo>
    git commit
-   \\\
+   ```
 
 ---
 
-## 5. Buenas pr·cticas con contenedores (Docker)
+## 5. Buenas pr√°cticas con contenedores (Docker)
 
 ### Dockerfile
-- Usar im·genes base oficiales y ligeras: python:3.12-slim
+- Usar im√°genes base oficiales y ligeras: python:3.12-slim
 - Especificar versiones exactas (FROM python:3.12-slim no FROM python:latest)
 - Usar .dockerignore para excluir archivos innecesarios
-- Minimizar el n˙mero de capas (RUN agrupados con &&)
-- Limpiar cachÈ de apt despuÈs de instalar (m -rf /var/lib/apt/lists/*)
+- Minimizar el n√∫mero de capas (RUN agrupados con &&)
+- Limpiar cach√© de apt despu√©s de instalar (rm -rf /var/lib/apt/lists/*)
 - Usar --no-cache-dir en pip
 - **No ejecutar como root**: usar USER para crear un usuario no privilegiado
 - Exponer solo los puertos necesarios (EXPOSE 8000)
 
 ### docker-compose.yml
-- Usar la versiÛn m·s reciente de docker-compose (ersion: '3.8')
+- Usar la sintaxis m√°s reciente de Docker Compose v2 (sin version:)
 - Nombrar los contenedores descriptivamente (container_name: dockershield-web)
-- Usar vol˙menes para persistencia de datos
-- Pasar configuraciÛn mediante variables de entorno (archivo .env)
-- Especificar siempre command de forma explÌcita
+- Usar vol√∫menes para persistencia de datos
+- Pasar configuraci√≥n mediante variables de entorno (archivo .env)
+- Especificar siempre command de forma expl√≠cita
 
 ### Seguridad
 - No incluir secretos en el Dockerfile ni en la imagen
 - Usar archivos .env locales (nunca subirlos al repositorio)
-- En producciÛn, usar un proxy reverso (nginx) y Gunicorn/uWSGI
-- Escanear im·genes con herramientas como Trivy o Docker Scout
+- En producci√≥n, usar un proxy reverso (nginx) y Gunicorn/uWSGI
+- Escanear im√°genes con herramientas como Trivy o Docker Scout
 
 ---
 
-## 6. IntegraciÛn Continua (CI/CD)
+## 6. Integraci√≥n Continua (CI/CD)
 
 ### GitHub Actions
 - Ejecutar el pipeline en cada push y pull request
 - Verificar que el contenedor se construye correctamente
-- Usar caching de Docker Layers para builds m·s r·pidos
+- Usar caching de Docker Layers para builds m√°s r√°pidos
 - No hacer push a registries (Docker Hub) sin verificar que pase los tests
 
-### Buenas pr·cticas
-- Pipeline r·pido (< 10 minutos)
+### Buenas pr√°cticas
+- Pipeline r√°pido (< 10 minutos)
 - Un solo job por responsabilidad
-- Usar matrices (matrix) para probar m˙ltiples versiones si es necesario
+- Usar matrices (matrix) para probar m√∫ltiples versiones si es necesario
 - Notificar al equipo si el pipeline falla
 
 ---
 
-## 7. Trabajo en equipo - Revisiones de cÛdigo (Code Review)
+## 7. Trabajo en equipo - Revisiones de c√≥digo (Code Review)
 
 ### Para el autor del PR
-- Hacer PR pequeÒos y enfocados (m·ximo 200-300 lÌneas)
-- Incluir descripciÛn clara: quÈ hace y por quÈ
-- Asignar revisores especÌficos
+- Hacer PR peque√±os y enfocados (m√°ximo 200-300 l√≠neas)
+- Incluir descripci√≥n clara: qu√© hace y por qu√©
+- Asignar revisores espec√≠ficos
 - Responder a los comentarios con cambios o explicaciones
 
 ### Para el revisor
-- Revisar dentro de las 24 horas h·biles
-- Enfocarse en la lÛgica, no en el estilo (para eso est·n los linters)
-- Ser constructivo: "øQuÈ tal si movemos esto a una funciÛn separada?"
-- Aprobar solo cuando estÈ seguro de que el cÛdigo es correcto
+- Revisar dentro de las 24 horas h√°biles
+- Enfocarse en la l√≥gica, no en el estilo (para eso est√°n los linters)
+- Ser constructivo: "¬øQu√© tal si movemos esto a una funci√≥n separada?"
+- Aprobar solo cuando est√© seguro de que el c√≥digo es correcto
 
 ---
 
 ## 8. Checklist antes de hacer merge a main
 
-- [ ] øEl cÛdigo compila/ejecuta sin errores?
-- [ ] øPasaron todas las pruebas?
-- [ ] øSe construye correctamente la imagen Docker?
-- [ ] øLos mensajes de commit siguen el formato Conventional Commits?
-- [ ] øSe eliminaron los secretos o credenciales?
-- [ ] øLa rama est· actualizada con develop?
-- [ ] øAlguien m·s revisÛ el cÛdigo?
-- [ ] øSe actualizÛ la documentaciÛn si es necesario?
+- [ ] ¬øEl c√≥digo compila/ejecuta sin errores?
+- [ ] ¬øPasaron todas las pruebas?
+- [ ] ¬øSe construye correctamente la imagen Docker?
+- [ ] ¬øLos mensajes de commit siguen el formato Conventional Commits?
+- [ ] ¬øSe eliminaron los secretos o credenciales?
+- [ ] ¬øLa rama est√° actualizada con develop?
+- [ ] ¬øAlguien m√°s revis√≥ el c√≥digo?
+- [ ] ¬øSe actualiz√≥ la documentaci√≥n si es necesario?
 
 ---
 
